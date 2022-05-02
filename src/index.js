@@ -2,14 +2,18 @@ import React from 'react';
 import AppViews from './views/AppViews';
 import DeployerViews from './views/DeployerViews';
 import AttacherViews from './views/AttacherViews';
-import {renderDOM, renderView} from './views/render';
+import { renderDOM, renderView } from './views/render';
 import './index.css';
 import * as backend from './build/index.main.mjs';
 import { loadStdlib } from '@reach-sh/stdlib';
-const reach = loadStdlib(process.env);
 
-const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
-const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
+import { ALGO_MyAlgoConnect as MyAlgoConnect } from '@reach-sh/stdlib';
+const reach = loadStdlib(process.env);
+reach.setWalletFallback(reach.walletFallback({
+  providerEnv: 'TestNet', MyAlgoConnect }));
+  
+const handToInt = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10};
+const intToOutcome = ['Alice wins!', 'Draw!', 'Bob wins!'];
 const {standardUnit} = reach;
 const defaults = {defaultFundAmt: '10', defaultWager: '3', standardUnit};
 
@@ -41,16 +45,24 @@ class App extends React.Component {
 
 class Player extends React.Component {
   random() { return reach.hasRandom.random(); }
-  async getHand() { // Fun([], UInt)
+  async getFinger() { // Fun([], UInt)
     const hand = await new Promise(resolveHandP => {
-      this.setState({view: 'GetHand', playable: true, resolveHandP});
+      this.setState({view: 'GetFinger', playable: true, resolveHandP});
     });
     this.setState({view: 'WaitingForResults', hand});
     return handToInt[hand];
   }
+  async getGuess() { // Fun([], UInt)
+    const guess = await new Promise(resolveGuess => {
+      this.setState({view: 'GetGuess', playable: true, resolveGuess});
+    });
+    this.setState({view: 'WaitingForResults', guess});
+    return handToInt[guess];
+  }
   seeOutcome(i) { this.setState({view: 'Done', outcome: intToOutcome[i]}); }
   informTimeout() { this.setState({view: 'Timeout'}); }
   playHand(hand) { this.state.resolveHandP(hand); }
+  playGuess(guess) { this.state.resolveGuess(guess); }
 }
 
 class Deployer extends Player {

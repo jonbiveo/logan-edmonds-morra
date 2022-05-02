@@ -29,7 +29,6 @@ const Player = {
   ...hasRandom,
   getFinger: Fun([], UInt),
   getGuess: Fun([UInt], UInt),
-  seeWinningNumber: Fun([UInt], Null),
   seeOutcome: Fun([UInt], Null),
   informTimeout: Fun([], Null)
 };
@@ -106,7 +105,7 @@ export const main = Reach.App(() => {
 
     Alice.only(() => {
       const winningNumber = fingersA + fingersB;
-      interact.seeWinningNumber(winningNumber);
+      interact.seeOutcome(winningNumber);
     });
     Alice.publish(winningNumber)
       .timeout(relativeTime(deadline), () => closeTo(Bob, informTimeout));
